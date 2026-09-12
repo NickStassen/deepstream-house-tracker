@@ -1,0 +1,15 @@
+# build output
+build/
+*.o
+bin/
+# model weights / engines are downloaded or generated, never committed
+models/*.weights
+models/*.cfg
+models/*.engine
+models/*.onnx
+models/*.bin
+# third-party checkout
+third_party/
+# runtime
+*.log
+events/

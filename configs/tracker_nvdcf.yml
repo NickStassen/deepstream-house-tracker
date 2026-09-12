@@ -1,0 +1,36 @@
+%YAML:1.0
+# NvDCF tracker (DeepStream 5.1). Tuned for a single live camera on a Nano:
+# small feature size, modest search region, no re-identification.
+NvDCF:
+  useUniqueID: 1
+  maxTargetsPerStream: 60
+  filterLr: 0.075
+  filterChannelWeightsLr: 0.1
+  gaussianSigma: 0.75
+  featureImgSizeLevel: 2
+  SearchRegionPaddingScale: 1
+  minDetectorConfidence: 0.0
+  minTrackerConfidence: 0.6
+  minTargetBboxSize: 10
+  minDetectorBboxVisibilityTobeTracked: 0.0
+  minVisibiilty4Tracking: 0.0
+  targetDuplicateRunInterval: 5
+  minIou4TargetDuplicate: 0.9
+  useColorNames: 1
+  useHog: 0
+  useHighPrecisionFeature: 0
+  probationAge: 3
+  earlyTerminationAge: 1
+  maxShadowTrackingAge: 30
+  minMatchingScore4Overall: 0.0
+  minMatchingScore4SizeSimilarity: 0.5
+  minMatchingScore4Iou: 0.1
+  minMatchingScore4VisualSimilarity: 0.2
+  matchingScoreWeight4VisualSimilarity: 0.8
+  matchingScoreWeight4SizeSimilarity: 0.0
+  matchingScoreWeight4Iou: 0.1
+  matchingScoreWeight4Age: 0.1
+  useTrackSmoothing: 1
+  trackExponentialSmoothingLr_loc: 0.5
+  trackExponentialSmoothingLr_scale: 0.3
+  trackExponentialSmoothingLr_velocity: 0.05

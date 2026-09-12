@@ -1,0 +1,34 @@
+# nvinfer configuration: YOLOv4-tiny (Darknet, COCO 80 classes) built into a
+# TensorRT FP16 engine by the DeepStream-Yolo custom lib on first run.
+# Paths are relative to this file's directory (nvinfer resolves them so).
+[property]
+gpu-id=0
+net-scale-factor=0.0039215697906911373
+model-color-format=0
+custom-network-config=../models/yolov4-tiny.cfg
+model-file=../models/yolov4-tiny.weights
+# Generated on first run (takes several minutes on a Nano); reused afterwards.
+model-engine-file=../models/yolov4-tiny_b1_gpu0_fp16.engine
+labelfile-path=labels_coco.txt
+batch-size=1
+# 0 = FP32, 1 = INT8, 2 = FP16. FP16 is the sweet spot on the Nano's Maxwell GPU.
+network-mode=2
+num-detected-classes=80
+# Run inference on every Nth frame; the tracker fills the gaps. 0 = every frame.
+interval=1
+gie-unique-id=1
+process-mode=1
+network-type=0
+cluster-mode=2
+maintain-aspect-ratio=0
+symmetric-padding=1
+force-implicit-batch-dim=1
+workspace-size=1000
+parse-bbox-func-name=NvDsInferParseYolo
+custom-lib-path=../third_party/DeepStream-Yolo/nvdsinfer_custom_impl_Yolo/libnvdsinfer_custom_impl_Yolo.so
+engine-create-func-name=NvDsInferYoloCudaEngineGet
+
+[class-attrs-all]
+nms-iou-threshold=0.45
+pre-cluster-threshold=0.30
+topk=100

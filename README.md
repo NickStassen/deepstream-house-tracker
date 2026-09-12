@@ -88,7 +88,11 @@ More options (`bin/house-tracker --help`):
 | Flag | Meaning |
 |---|---|
 | `--source file:///clip.mp4` / `rtsp://...` | Use a URI instead of the CSI camera (hardware decode) |
-| `--width/--height/--fps` | Camera capture mode (default 1280x720@30) |
+| `--width/--height/--fps` | Camera capture mode (default 1280x720@30; 720p comes from the 2x2-binned sensor mode, best in low light) |
+| `--tnr N`, `--tnr-strength F` | Argus temporal noise reduction (default 2 = high quality, strength 1.0). Big win on static indoor scenes |
+| `--max-gain X` | Cap analog gain for auto exposure (default 8x). Trades brightness for noise in dim rooms |
+| `--max-exposure-ms MS` | Cap exposure time (default: one frame period). Lower `--fps` to allow longer exposures |
+| `--ee-mode N` | Edge enhancement (default 0 = off; sharpening amplifies sensor noise) |
 | `--flip N` | Rotate/flip the camera (2 = 180 degrees) |
 | `--tracker nvdcf\|klt\|iou` | Tracker backend (default NvDCF, visual features; KLT/IOU are cheaper) |
 | `--tracker-width/-height` | Tracker working resolution, multiples of 32 |
@@ -99,6 +103,20 @@ More options (`bin/house-tracker --help`):
 | `--lost-frames N` | Frames without a match before a track is declared lost |
 | `--summary-interval SEC` | Periodic count of what is in view, 0 = off |
 | `-c CONFIG` | Different nvinfer config (another model) |
+
+### Low light
+
+Small CSI sensors get noisy fast as a room dims: auto exposure hits the frame
+period and starts piling on analog gain. Defaults here are tuned for a house in
+the evening: TNR on, gain capped at 8x, edge enhancement off. For a dark room
+also drop the frame rate so exposure can lengthen:
+
+```sh
+scripts/run.sh --udp 192.168.1.219:5000 --fps 15            # 66 ms max exposure
+scripts/run.sh --udp 192.168.1.219:5000 --fps 10 --max-gain 4
+```
+
+For daylight or fast motion, `--tnr 0 --max-gain 0` restores the sensor defaults.
 
 ## Events
 

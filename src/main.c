@@ -96,6 +96,8 @@ int main(int argc, char *argv[])
 	AppConfig *c = &app.cfg;
 	c->sensor_id = 0; c->cap_width = 1280; c->cap_height = 720; c->cap_fps = 30;
 	c->flip_method = 0; c->wbmode = 1;
+	/* low-light friendly defaults for a small CSI sensor in a house */
+	c->tnr_mode = 2; c->tnr_strength = 1.0; c->ee_mode = 0; c->max_gain = 8.0; c->max_exposure_ms = 0;
 	c->tracker = g_strdup("nvdcf"); c->tracker_width = 480; c->tracker_height = 288;
 	c->bitrate_kbps = 4000; c->lost_frames = 30; c->summary_interval = 10;
 
@@ -106,6 +108,11 @@ int main(int argc, char *argv[])
 		{ "fps", 0, 0, G_OPTION_ARG_INT, &c->cap_fps, "Capture frame rate (default 30)", "N" },
 		{ "flip", 0, 0, G_OPTION_ARG_INT, &c->flip_method, "nvvidconv flip-method 0..7 (2 = 180 deg)", "N" },
 		{ "wbmode", 0, 0, G_OPTION_ARG_INT, &c->wbmode, "nvarguscamerasrc white balance mode (default 1 = auto)", "N" },
+		{ "tnr", 0, 0, G_OPTION_ARG_INT, &c->tnr_mode, "Temporal noise reduction: 0 off, 1 fast, 2 high quality (default 2)", "N" },
+		{ "tnr-strength", 0, 0, G_OPTION_ARG_DOUBLE, &c->tnr_strength, "TNR strength -1.0..1.0 (default 1.0)", "F" },
+		{ "ee-mode", 0, 0, G_OPTION_ARG_INT, &c->ee_mode, "Edge enhancement: 0 off, 1 fast, 2 high quality (default 0, sharpening amplifies noise)", "N" },
+		{ "max-gain", 0, 0, G_OPTION_ARG_DOUBLE, &c->max_gain, "Analog gain ceiling for auto exposure, e.g. 8 (default 8; 0 = sensor max)", "X" },
+		{ "max-exposure-ms", 0, 0, G_OPTION_ARG_DOUBLE, &c->max_exposure_ms, "Exposure ceiling in ms (default 0 = one frame period)", "MS" },
 		{ "source", 'i', 0, G_OPTION_ARG_STRING, &c->source_uri, "Use a URI (file:///x.mp4, rtsp://...) instead of the CSI camera", "URI" },
 		{ "infer-config", 'c', 0, G_OPTION_ARG_FILENAME, &c->infer_config, "nvinfer config (default configs/config_infer_primary_yolov4-tiny.txt)", "PATH" },
 		{ "tracker", 't', 0, G_OPTION_ARG_STRING, &c->tracker, "nvdcf | klt | iou (default nvdcf)", "NAME" },

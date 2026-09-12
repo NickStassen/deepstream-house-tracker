@@ -12,6 +12,11 @@ typedef struct {
 	gint      cap_width, cap_height, cap_fps;
 	gint      flip_method;
 	gint      wbmode;
+	gint      tnr_mode;        /* nvarguscamerasrc tnr-mode 0 off, 1 fast, 2 high quality */
+	gdouble   tnr_strength;    /* -1..1 */
+	gint      ee_mode;         /* edge enhancement 0 off, 1 fast, 2 high quality */
+	gdouble   max_gain;        /* analog gain ceiling, 0 = sensor default */
+	gdouble   max_exposure_ms; /* exposure ceiling, 0 = frame duration */
 	gchar    *source_uri;      /* if set, use uridecodebin instead of CSI */
 	/* inference / tracking */
 	gchar    *infer_config;

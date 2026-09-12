@@ -89,7 +89,18 @@ static gboolean add_source(App *app, GstBin *bin, GError **err)
 	if (!src || !caps || !conv || !caps2) return FALSE;
 	/* bufapi-version=1: emit NvBufSurface buffers that nvstreammux understands
 	 * (without it: "Input buffer number of surfaces (0) must be equal to ..."). */
-	g_object_set(src, "sensor-id", c->sensor_id, "wbmode", c->wbmode, "bufapi-version", TRUE, NULL);
+	g_object_set(src, "sensor-id", c->sensor_id, "wbmode", c->wbmode, "bufapi-version", TRUE,
+		"tnr-mode", c->tnr_mode, "tnr-strength", (gfloat) c->tnr_strength, "ee-mode", c->ee_mode, NULL);
+	if (c->max_gain > 0) {
+		gchar *gr = g_strdup_printf("1 %.2f", c->max_gain);
+		g_object_set(src, "gainrange", gr, NULL);   /* Argus AE keeps analog gain <= this */
+		g_free(gr);
+	}
+	if (c->max_exposure_ms > 0) {
+		gchar *er = g_strdup_printf("13000 %.0f", c->max_exposure_ms * 1e6);  /* ns */
+		g_object_set(src, "exposuretimerange", er, NULL);
+		g_free(er);
+	}
 	if (c->flip_method) g_object_set(conv, "flip-method", c->flip_method, NULL);
 	gst_bin_add_many(bin, src, caps, conv, caps2, NULL);
 	if (!gst_element_link_many(src, caps, conv, caps2, NULL)) {

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <signal.h>
 #include <glib-unix.h>
+#include <glib/gstdio.h>
 #include "app.h"
 
 static App *g_app;
@@ -65,6 +66,15 @@ static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
 		break;
 	}
 	return TRUE;
+}
+
+static void absolutize(gchar **path)
+{
+	if (!*path || g_path_is_absolute(*path)) return;
+	gchar *cwd = g_get_current_dir();
+	gchar *abs = g_build_filename(cwd, *path, NULL);
+	g_free(cwd); g_free(*path);
+	*path = abs;
 }
 
 /* Default config paths live next to the binary: bin/../configs/... */
@@ -130,6 +140,23 @@ int main(int argc, char *argv[])
 		c->tracker_config = default_path(argv[0], "configs/tracker_nvdcf.yml");
 	if (!c->udp_target && !c->display && !c->record_path)
 		g_printerr("note: no --udp/--display/--record given; running headless, events only\n");
+
+	/*
+	 * nvinfer resolves paths in its config relative to the config file, but
+	 * the DeepStream-Yolo custom lib opens custom-network-config/model-file
+	 * relative to the process CWD. Make every user-supplied path absolute,
+	 * then chdir to the config's directory so both conventions agree.
+	 */
+	absolutize(&c->infer_config);
+	absolutize(&c->tracker_config);
+	absolutize(&c->record_path);
+	absolutize(&c->events_path);
+	{
+		gchar *dir = g_path_get_dirname(c->infer_config);
+		if (g_chdir(dir) != 0)
+			g_printerr("warning: could not chdir to %s\n", dir);
+		g_free(dir);
+	}
 
 	app.loop = g_main_loop_new(NULL, FALSE);
 	g_mutex_init(&app.lock);

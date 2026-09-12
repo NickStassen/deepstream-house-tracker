@@ -2,7 +2,7 @@
 # NvDCF tracker (DeepStream 5.1). Tuned for a single live camera on a Nano:
 # small feature size, modest search region, no re-identification.
 NvDCF:
-  useUniqueID: 1
+  useUniqueID: 0   # small per-stream ids in events instead of 64-bit hashes
   maxTargetsPerStream: 60
   filterLr: 0.075
   filterChannelWeightsLr: 0.1

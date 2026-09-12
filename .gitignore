@@ -13,3 +13,4 @@ third_party/
 # runtime
 *.log
 events/
+configs/*.engine

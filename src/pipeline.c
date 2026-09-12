@@ -56,7 +56,8 @@ static void on_decode_child_added(GstChildProxy *proxy, GObject *obj, gchar *nam
 	if (g_str_has_prefix(name, "decodebin"))
 		g_signal_connect(obj, "child-added", G_CALLBACK(on_decode_child_added), user_data);
 	if (g_str_has_prefix(name, "nvv4l2decoder"))
-		g_object_set(obj, "enable-max-performance", TRUE, "drop-frame-interval", 0, "num-extra-surfaces", 0, NULL);
+		g_object_set(obj, "enable-max-performance", TRUE, "drop-frame-interval", 0,
+			"num-extra-surfaces", 0, "bufapi-version", TRUE, NULL);
 }
 
 static gboolean add_source(App *app, GstBin *bin, GError **err)
@@ -77,10 +78,18 @@ static gboolean add_source(App *app, GstBin *bin, GError **err)
 		c->cap_width, c->cap_height, c->cap_fps);
 	GstElement *caps = caps_filter("source-caps", cs, err);
 	g_free(cs);
-	GstElement *conv = mk("nvvideoconvert", "source-conv", err);
+	/*
+	 * L4T's nvvidconv, not DeepStream's nvvideoconvert: buffers from
+	 * nvarguscamerasrc passed through nvvideoconvert arrive at nvstreammux
+	 * with zero filled surfaces ("Input buffer number of surfaces (0) must be
+	 * equal to ..."). This mirrors deepstream-app's CSI source bin.
+	 */
+	GstElement *conv = mk("nvvidconv", "source-conv", err);
 	GstElement *caps2 = caps_filter("source-caps2", "video/x-raw(memory:NVMM),format=NV12", err);
 	if (!src || !caps || !conv || !caps2) return FALSE;
-	g_object_set(src, "sensor-id", c->sensor_id, "wbmode", c->wbmode, NULL);
+	/* bufapi-version=1: emit NvBufSurface buffers that nvstreammux understands
+	 * (without it: "Input buffer number of surfaces (0) must be equal to ..."). */
+	g_object_set(src, "sensor-id", c->sensor_id, "wbmode", c->wbmode, "bufapi-version", TRUE, NULL);
 	if (c->flip_method) g_object_set(conv, "flip-method", c->flip_method, NULL);
 	gst_bin_add_many(bin, src, caps, conv, caps2, NULL);
 	if (!gst_element_link_many(src, caps, conv, caps2, NULL)) {

@@ -141,11 +141,23 @@ third_party/      DeepStream-Yolo checkout (created by `make yolo-lib`, git-igno
 
 ## Performance notes (Jetson Nano, MAXN)
 
-YOLOv4-tiny at its native 416x416 input in FP16 runs roughly 20 to 25 fps on the
-Nano's GPU on its own. With `interval=1` in the nvinfer config the detector runs
-on every other frame and the tracker carries objects in between, which keeps the
-camera at 30 fps with a modest CPU load. Set `interval=0` for detection on every
-frame if latency of new objects matters more than smoothness.
+Measured on this board with the OV5647 at 1280x720 (Argus scales from the
+sensor's 1296x972 mode), `interval=1`, NvDCF at 480x288:
+
+| Metric | Value |
+|---|---|
+| Pipeline frame rate | 30 fps (camera-bound) |
+| GPU load (`tegrastats` GR3D) | 40 to 45 % |
+| CPU load | 25 to 35 % per core |
+| RAM used, whole system | 2.3 GB of 4 GB |
+| First-run engine build | 2 min 44 s |
+| Engine file | 31 MB, `configs/model_b1_gpu0_fp16.engine` |
+
+YOLOv4-tiny FP16 alone runs roughly 20 to 25 fps on the Nano, so with
+`interval=1` the detector sees every other frame and the tracker carries objects
+in between. Set `interval=0` for detection on every frame if the latency of new
+objects matters more than smoothness; expect the pipeline to drop to about
+20 fps.
 
 ## License
 

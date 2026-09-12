@@ -25,7 +25,7 @@ symmetric-padding=1
 force-implicit-batch-dim=1
 workspace-size=1000
 parse-bbox-func-name=NvDsInferParseYolo
-custom-lib-path=../third_party/DeepStream-Yolo/nvdsinfer_custom_impl_Yolo/libnvdsinfer_custom_impl_Yolo.so
+custom-lib-path=../third_party/DeepStream-Yolo/native/nvdsinfer_custom_impl_Yolo/libnvdsinfer_custom_impl_Yolo.so
 engine-create-func-name=NvDsInferYoloCudaEngineGet
 
 [class-attrs-all]

@@ -2,6 +2,7 @@
 #ifndef HOUSE_TRACKER_APP_H
 #define HOUSE_TRACKER_APP_H
 
+#include <stdio.h>
 #include <gst/gst.h>
 #include <glib.h>
 
